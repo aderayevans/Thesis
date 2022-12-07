@@ -9,6 +9,7 @@ import tensorflow_hub as hub
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 IMAGE_SHAPE = (320, 320)
+INPUT_SHAPE = (320, 320, 3)
 
 
 class Model:
@@ -17,6 +18,10 @@ class Model:
             self.model = AlexNetModel()
         elif model_name == "AlexNet":
             self.model = AlexNetModel()
+        elif model_name == "LeNet5":
+            self.model = LeNet5Model()
+        elif model_name == "VGG16":
+            self.model = VGG16Model()
         else:
             self.set_model(model_name)
 
@@ -110,7 +115,7 @@ class Model:
 def AlexNetModel():
     AlexNet = tf.keras.Sequential([
         #1st Convolutional Layer
-        tf.keras.layers.Conv2D(filters=96, input_shape=(320, 320, 3), kernel_size=(11,11), strides=(4,4), padding='same'),
+        tf.keras.layers.Conv2D(filters=96, input_shape=INPUT_SHAPE, kernel_size=(11,11), strides=(4,4), padding='same'),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('relu'),
         tf.keras.layers.MaxPooling2D(pool_size=(2,2), strides=(2,2), padding='same'),
@@ -169,6 +174,25 @@ def AlexNetModel():
 
     return AlexNet
 
+def LeNet5Model():
+    LeNet5 = tf.keras.Sequential([
+        tf.keras.layers.Conv2D(filters=6, kernel_size=(3, 3), activation='relu', input_shape=INPUT_SHAPE),
+        tf.keras.layers.AveragePooling2D(),
+        tf.keras.layers.Conv2D(filters=16, kernel_size=(3, 3), activation='relu'),
+        tf.keras.layers.AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(120, activation='relu'),
+        tf.keras.layers.Dense(84, activation='relu'),
+        tf.keras.layers.Dense(10, activation='softmax'),
+    ])
+
+    return LeNet5
+
+def VGG16Model():
+    model = tf.keras.applications.vgg16.VGG16()
+    model2 = tf.keras.Model(model.input, model.layers[-2].output)
+    return model2
+
 def image_to_bytes(image):
     # print(image.shape)
     # image = cv2.resize(image, (32, 32))
@@ -202,15 +226,6 @@ def change_input_shape(model):
 
     return new_model
 
-# def _load_model(path):
-    # model = 
-
-    # new_model = VGG16(weights=None, input_shape=new_shape, include_top=False)
-    # for new_layer, layer in zip(new_model.layers[1:], model.layers[1:]):
-    # new_layer.set_weights(layer.get_weights())
-
-    # return new_layer
-
 def demo():
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../models/imagenet_mobilenet_v2_100_128_classification_3_default_1/model.json")
 
@@ -222,6 +237,7 @@ def demo():
 def main():
 
     # path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../models/saved_model/my_model")
+    # path = "VGG16"
     path = "AlexNet"
     model_handler = Model(path)
     model = model_handler.get_model()
