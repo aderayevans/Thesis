@@ -64,7 +64,7 @@ class Model:
         return self.model.to_json()
 
     def set_input_image(self, image):
-        image = cv2.resize(image, (640, 640), interpolation = cv2.INTER_AREA)
+        image = cv2.resize(image, IMAGE_SHAPE, interpolation = cv2.INTER_AREA)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         self.image = image
 
@@ -249,7 +249,7 @@ def main():
     image_file = "Photo/sadtest.jpg"
     file = os.path.join(os.path.dirname(os.path.realpath(__file__)), image_file)
     image = cv2.imread(file)
-    image = cv2.resize(image, (640, 640), interpolation = cv2.INTER_AREA)
+    image = cv2.resize(image, IMAGE_SHAPE, interpolation = cv2.INTER_AREA)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     tensor_input = np.array([cv2.resize(image, IMAGE_SHAPE), ], dtype=float) / 255.
